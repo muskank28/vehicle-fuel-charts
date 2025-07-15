@@ -1,0 +1,170 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: linear-gradient(135deg, #25313d, #030522);
+  background-attachment: fixed;
+  color: #ffffff;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+.logo {
+  position: absolute;
+  top: 1rem;
+  right: 20px;
+  width: 85px;
+  height: auto;
+  z-index: 1001;
+}
+
+.logo {
+  max-width: 100px;
+  height: auto;
+  object-fit: contain;
+}
+
+
+h2 {
+  text-align: center;
+  margin-top: 3rem;
+  font-size: 1.8rem;
+  letter-spacing: 1px;
+}
+
+h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.4rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+p {
+  text-align: center;
+}
+
+.main-container {
+  max-width: 1100px;
+  margin: 2rem auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 0.5rem;
+}
+
+.grouped,
+.individual {
+  flex: 1 1 45%;
+  min-width: 350px;
+  height: 450px;
+  border: 2px solid rgba(255, 255, 255, 0.062);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.048);
+  background-color: rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.grouped:hover,
+.individual:hover {
+  transform: scale(1.01);
+}
+
+
+.grouped canvas,
+.individual canvas {
+  width: 100% !important;
+  height: 300px !important;
+}
+
+.grouped canvas{
+  position: relative;
+  top: 2.5rem;
+}
+
+.grouped button{
+  position: relative;
+  top: 1rem;
+}
+.individual select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  position: relative;
+  top: 0.5rem;
+}
+
+.vehicleOptions {
+  background-color: rgb(41, 41, 59);
+  color: #ffffff;
+}
+
+#vehicleSelect {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.chart-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.chart-toggle button {
+  padding: 0.4rem 1.2rem;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 6px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.chart-toggle button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.chart-toggle button.active {
+  background-color: rgba(255, 255, 255, 0.3);
+  font-weight: bold;
+}
+
+/* Responsive for tablets and smaller screens */
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .main-container {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .logo {
+    width: 70px;
+    top: 10px;
+    right: 15px;
+  }
+
+  h2 {
+    margin-top: 5rem;
+    font-size: 1.5rem;
+  }
+
+  .grouped,
+  .individual {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
