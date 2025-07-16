@@ -2,55 +2,59 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
-    <title>Live Fuel Monitoring</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Dashboard for live vehicle fuel monitoring and grouped usage visualizations." />
+  <title>Live Fuel Monitoring</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
 </head>
 
 <body>
+  <img src="itecknology-New-Logo.png.webp" alt="Logo" class="logo" width="85" height="85" />
+  <h2>LIVE FUEL MONITORING</h2>
 
-    <img src="itecknology-New-Logo.png.webp" alt="Logo" class="logo" />
+  <div class="main-container">
+    <!-- Grouped Chart Section -->
+    <div class="grouped">
+      <h3>Grouped Fuel Data</h3>
 
-    <h2>LIVE FUEL MONITORING</h2>
-
-    <div class="main-container">
-        <!-- Grouped Chart Section -->
-        <div class="grouped">
-            <h3>Grouped Fuel Data</h3>
-            <div class="chart-toggle">
-                <button id="groupedBarBtn" class="active">Bar</button>
-                <button id="groupedLineBtn">Line</button>
-            </div>
-            <canvas id="groupedChart"></canvas>
-        </div>
-
-        <!-- Individual Chart Section -->
-        <div class="individual">
-            <h3>Individual Vehicle Fuel Usage</h3>
-
-            <select id="vehicleSelect">
-                <option class="vehicleOptions" value="" disabled selected hidden>Select Vehicle</option>
-                <option class="vehicleOptions" value="vehicle1">Vehicle 1</option>
-                <option class="vehicleOptions" value="vehicle2">Vehicle 2</option>
-                <option class="vehicleOptions" value="vehicle3">Vehicle 3</option>
-                <option class="vehicleOptions" value="vehicle4">Vehicle 4</option>
-                <option class="vehicleOptions" value="vehicle5">Vehicle 5</option>
-            </select>
-
-            <div class="chart-toggle">
-                <button id="individualLineBtn" class="active">Line</button>
-                <button id="individualBarBtn">Bar</button>
-            </div>
-
-            <canvas id="individualChart"></canvas>
-        </div>
-        
+      <label for="groupGranularity">View By:</label>
+      <select id="groupGranularity">
+        <option value="daily">Per Day</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly" selected>Monthly</option>
+        <option value="yearly">Yearly</option>
+      </select>
+      <div id="groupedChart" style="width: 100%; height: 300px;"></div>
     </div>
-    <script src="script.js"></script>
 
+    <!-- Individual Chart Section -->
+    <div class="individual">
+      <h3>Individual Vehicle Fuel Usage</h3>
+
+      <select id="vehicleSelect">
+        <option value="" disabled selected hidden>Select Vehicle</option>
+        <option value="vehicle1">Vehicle 1</option>
+        <option value="vehicle2">Vehicle 2</option>
+        <option value="vehicle3">Vehicle 3</option>
+        <option value="vehicle4">Vehicle 4</option>
+        <option value="vehicle5">Vehicle 5</option>
+      </select>
+
+      <div class="date-range">
+        <label for="fromDate">From:</label>
+        <input type="date" id="fromDate" />
+        <label for="toDate">To:</label>
+        <input type="date" id="toDate" />
+      </div>
+
+      <div id="individualChart" style="width: 100%; height: 300px;"></div>
+    </div>
+  </div>
+
+  <script type="module" src="main.js" defer></script>
 </body>
 
 </html>
