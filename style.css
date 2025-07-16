@@ -107,6 +107,9 @@ input[type="date"] {
   color: var(--text-color);
 }
 
+.selectOption{
+  background-color: rgb(52, 52, 61);
+}
 /* Chart Toggle Buttons */
 .chart-toggle {
   display: flex;
