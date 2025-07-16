@@ -12,8 +12,3 @@ A responsive web dashboard to visualize grouped and individual vehicle fuel usag
 - HTML, CSS, JavaScript
 - [ECharts](https://echarts.apache.org/)
 - [DateRangePicker](https://www.daterangepicker.com/)
-
- 🚀 Usage
-1. Clone the repo  
-   `git clone https://github.com/your-username/fuel-monitoring-dashboard.git`
-2. Open `index.html` in your browser
