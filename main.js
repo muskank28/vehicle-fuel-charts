@@ -4,23 +4,71 @@ document.addEventListener('DOMContentLoaded', () => {
   const groupedChart = echarts.init(document.getElementById('groupedChart'));
   const individualChart = echarts.init(document.getElementById('individualChart'));
 
-  // Generate grouped chart data
-  function generateGroupedData(granularity = 'monthly') {
-    const groupedMap = fuelData[granularity];
-    console.log(`[Grouped Data] Using granularity: ${granularity}`, groupedMap);
+  function generateAggregatedData(dailyData, granularity = 'monthly') {
+    const groupFormat = {
+      weekly: 'GGGG-[W]WW',  // e.g. 2025-W29
+      monthly: 'YYYY-MM',    // e.g. 2025-07
+      yearly: 'YYYY'         // e.g. 2025
+    }[granularity];
 
-    const labels = Object.keys(groupedMap[Object.keys(groupedMap)[0]] || {}).sort();
-    const summedData = labels.map(label =>
-      Object.values(groupedMap).reduce((sum, vehicle) => sum + (vehicle[label] || 0), 0)
-    );
+    const aggregated = {};
 
-    return { labels, data: summedData };
+    for (const [vehicle, logs] of Object.entries(dailyData)) {
+      const vehicleGroup = {};
+
+      for (const [dateStr, liters] of Object.entries(logs)) {
+        const groupKey = moment(dateStr).format(groupFormat);
+        if (!vehicleGroup[groupKey]) vehicleGroup[groupKey] = 0;
+        vehicleGroup[groupKey] += liters;
+      }
+
+      aggregated[vehicle] = vehicleGroup;
+    }
+
+    return aggregated;
   }
+
+  // Generate grouped chart data
+  function generateGroupedData(granularity = 'monthly', startDate = null, endDate = null) {
+    const groupedMap =
+      granularity === 'daily'
+        ? fuelData.daily
+        : generateAggregatedData(fuelData.daily, granularity);
+
+    const labels = [];
+    const vehicleData = {};
+
+    Object.keys(groupedMap).forEach(vehicle => {
+      vehicleData[vehicle] = [];
+    });
+
+    const sampleVehicle = Object.keys(groupedMap)[0];
+    const allDates = Object.keys(groupedMap[sampleVehicle]);
+
+    const filteredDates = allDates.filter(date => {
+      if (!startDate || !endDate) return true;
+      return date >= startDate && date <= endDate;
+    });
+
+    filteredDates.sort();
+
+    filteredDates.forEach(date => {
+      labels.push(date);
+      Object.entries(groupedMap).forEach(([vehicle, data]) => {
+        vehicleData[vehicle].push(data[date] ?? 0);
+      });
+    });
+
+    return { labels, vehicleData };
+  }
+
+
+
+  document.getElementById('groupGranularity').value = 'daily';
 
   // Update Grouped Chart
   function updateGroupedChart(granularity = 'monthly') {
-    console.log(`🟦 Updating Grouped Chart with: ${granularity}`);
-    const { labels, data } = generateGroupedData(granularity);
+    const { labels, vehicleData } = generateGroupedData(granularity);
 
     groupedChart.setOption({
       tooltip: { trigger: 'axis' },
@@ -38,10 +86,10 @@ document.addEventListener('DOMContentLoaded', () => {
         axisLine: { lineStyle: { color: '#ccc' } },
         splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.1)' } }
       },
-      series: [{
-        name: 'Total Fuel',
+      series: Object.keys(vehicleData).map(vehicle => ({
+        name: vehicle,
         type: 'line',
-        data,
+        data: vehicleData[vehicle],
         lineStyle: { width: 3, color: '#3b84c0ff' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
@@ -50,7 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
           ])
         },
         itemStyle: { color: '#3b84c0' }
-      }],
+      })),
+
       backgroundColor: 'transparent'
     });
   }
@@ -58,29 +107,35 @@ document.addEventListener('DOMContentLoaded', () => {
   // Update Individual Chart
   function updateIndividualChart(vehicleId, fromDate, toDate) {
     const granularity = document.getElementById('groupGranularity').value || 'monthly';
-    const vehicleDataMap = fuelData[granularity];
-
-    console.log(`🔴 Updating Individual Chart for: ${vehicleId}, From: ${fromDate}, To: ${toDate}`);
+    const vehicleDataMap =
+      granularity === 'daily'
+        ? fuelData.daily
+        : generateAggregatedData(fuelData.daily, granularity);
 
     if (!vehicleId || !vehicleDataMap[vehicleId]) {
-      console.warn('⚠️ No vehicle selected or data missing:', vehicleId);
       individualChart.clear();
       return;
     }
 
     const rawData = vehicleDataMap[vehicleId];
     const from = moment(fromDate, 'YYYY-MM-DD');
-    const to = moment(toDate, 'YYYY-MM-DD');
+    const to = moment(toDate, 'YYYY-MM-DD').endOf('day');
+
 
     const labels = Object.keys(rawData).sort().filter(label => {
-      const labelDate = moment(label, 'YYYY-MM-DD');
+
+      const format = {
+        daily: 'YYYY-MM-DD',
+        weekly: 'GGGG-[W]WW',
+        monthly: 'YYYY-MM',
+        yearly: 'YYYY'
+      }[granularity];
+
+      const labelDate = moment(label, format);
       return labelDate.isSameOrAfter(from) && labelDate.isSameOrBefore(to);
     });
 
     const values = labels.map(label => rawData[label]);
-
-    console.log(`[Chart Data] Labels:`, labels);
-    console.log(`[Chart Data] Values:`, values);
 
     individualChart.setOption({
       tooltip: { trigger: 'axis' },
@@ -122,7 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
     endDate: moment().endOf('month'),
     locale: { format: 'YYYY-MM-DD' }
   }, function (start, end) {
-    console.log(`📅 Date range changed: ${start.format('YYYY-MM-DD')} to ${end.format('YYYY-MM-DD')}`);
     const vehicleId = document.getElementById('vehicleSelect').value;
     if (vehicleId) {
       updateIndividualChart(vehicleId, start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
@@ -151,21 +205,50 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('resize', () => {
     groupedChart.resize();
     individualChart.resize();
-    console.log('📏 Window resized - charts resized.');
   });
 
-  // Initial Load
-  updateGroupedChart();
+  // Initial Load for Grouped Chart using daily data
+  const today = moment().format('YYYY-MM-DD');
+  const { labels, vehicleData } = generateGroupedData('daily', today, today);
 
-  const defaultVehicle = 'vehicle1';
+  groupedChart.setOption({
+    tooltip: { trigger: 'axis' },
+    xAxis: {
+      type: 'category',
+      data: labels,
+      axisLabel: { color: '#fff' },
+      axisLine: { lineStyle: { color: '#ccc' } }
+    },
+    yAxis: {
+      type: 'value',
+      name: 'Fuel (Liters)',
+      nameTextStyle: { color: '#fff' },
+      axisLabel: { color: '#fff' },
+      axisLine: { lineStyle: { color: '#ccc' } },
+      splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.1)' } }
+    },
+    series: Object.keys(vehicleData).map(vehicle => ({
+      name: vehicle,
+      type: 'line',
+      data: vehicleData[vehicle],
+      lineStyle: { width: 3 },
+      itemStyle: { color: '#3b84c0' }
+    })),
+    backgroundColor: 'transparent'
+  });
+
+  const defaultVehicle = Object.keys(fuelData.daily)[0];
   document.getElementById('vehicleSelect').value = defaultVehicle;
 
   // Ensure date range picker is initialized before calling chart
   setTimeout(() => {
-    const range = $('#dateRange').data('daterangepicker');
-    if (range) {
-      console.log('🚀 Initializing Individual Chart...');
-      updateIndividualChart(defaultVehicle, range.startDate.format('YYYY-MM-DD'), range.endDate.format('YYYY-MM-DD'));
+    const today = moment().format('YYYY-MM-DD');
+    const dateRangePicker = $('#dateRange').data('daterangepicker');
+    if (dateRangePicker) {
+      dateRangePicker.setStartDate(today);
+      dateRangePicker.setEndDate(today);
+      updateIndividualChart(defaultVehicle, today, today);
     }
   }, 100);
+
 });
