@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
     individualChart.resize();
   });
 
-  // Initial Load for Grouped Chart using daily data
+  // Initial Load for Grouped Chart using Daily data
   const today = moment().format('YYYY-MM-DD');
   const { labels, vehicleData } = generateGroupedData('daily');
   updateGroupedChart('daily');
