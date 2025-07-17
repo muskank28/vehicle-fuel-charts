@@ -169,7 +169,6 @@ input[type="date"] {
     height: 250px;
   }
 }
-
 #dateRange {
   width: 100%;
   padding: 0.5rem;
@@ -178,41 +177,42 @@ input[type="date"] {
   border: none;
   outline: none;
   font-size: 1rem;
-  background-color: rgba(255, 255, 255, 0.07);
+  background-color: rgba(235, 225, 225, 0.07);
   color: var(--text-color);
 }
 
 /* Entire popup background */
 .daterangepicker {
-  background-color: #1b2a36 !important;
-  color: #0000 !important;
+  background-color: #ffffff !important; /* white background */
+  color: #000000 !important; /* black text */
   border: 1px solid #3b84c0;
   box-shadow: 0 0 10px rgba(59, 132, 192, 0.4);
 }
 
 /* Header (month/year) */
 .daterangepicker .calendar-table thead tr:first-child th {
-  background-color: #273444 !important;
-  color: #ffffff !important;
+  background-color: #f3f6f8 !important;
+  color: #000000 !important;
 }
 
 /* Day cells */
 .daterangepicker td,
 .daterangepicker th {
-  background-color: #273444 !important;
-  color: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
 }
 
 /* Hover effect on days */
 .daterangepicker td.available:hover,
 .daterangepicker th.available:hover {
-  background-color: #3b84c075 !important;
-  color: #ffffff !important;
+  background-color: #d0e9ff !important;
+  color: #000000 !important;
 }
 
 /* Selected range */
 .daterangepicker td.in-range {
-  background-color: #1f4a6dcc !important;
+  background-color: #e0f0ff !important;
+  color: #000000 !important;
 }
 
 /* Start and end dates */
@@ -224,7 +224,7 @@ input[type="date"] {
 
 /* Buttons at the bottom */
 .daterangepicker .drp-buttons {
-  background-color: #1b2a36;
+  background-color: #f9f9f9;
   border-top: 1px solid #3b84c0;
 }
 
@@ -238,4 +238,5 @@ input[type="date"] {
 
 .daterangepicker .drp-buttons .btn:hover {
   background-color: #2a6b99;
+  color: #ffffff;
 }

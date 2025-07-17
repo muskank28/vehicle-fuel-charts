@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Update Individual Chart
   function updateIndividualChart(vehicleId, fromDate, toDate) {
-    const granularity = document.getElementById('groupGranularity').value || 'monthly';
+    const granularity = 'daily';
     const vehicleDataMap =
       granularity === 'daily'
         ? fuelData.daily
@@ -209,7 +209,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial Load for Grouped Chart using daily data
   const today = moment().format('YYYY-MM-DD');
-  const { labels, vehicleData } = generateGroupedData('daily', today, today);
+  const { labels, vehicleData } = generateGroupedData('daily');
+  updateGroupedChart('daily');
 
   groupedChart.setOption({
     tooltip: { trigger: 'axis' },
