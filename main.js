@@ -30,80 +30,76 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Generate grouped chart data
   function generateGroupedData(granularity = 'monthly', startDate = null, endDate = null) {
-    const groupedMap =
-      granularity === 'daily'
-        ? fuelData.daily
-        : generateAggregatedData(fuelData.daily, granularity);
+  const groupedMap =
+    granularity === 'daily'
+      ? fuelData.daily
+      : generateAggregatedData(fuelData.daily, granularity);
 
-    const labels = [];
-    const vehicleData = {};
+  const dateTotals = {};
 
-    Object.keys(groupedMap).forEach(vehicle => {
-      vehicleData[vehicle] = [];
-    });
-
-    const sampleVehicle = Object.keys(groupedMap)[0];
-    const allDates = Object.keys(groupedMap[sampleVehicle]);
-
-    const filteredDates = allDates.filter(date => {
-      if (!startDate || !endDate) return true;
-      return date >= startDate && date <= endDate;
-    });
-
-    filteredDates.sort();
-
-    filteredDates.forEach(date => {
-      labels.push(date);
-      Object.entries(groupedMap).forEach(([vehicle, data]) => {
-        vehicleData[vehicle].push(data[date] ?? 0);
-      });
-    });
-
-    return { labels, vehicleData };
+  for (const vehicle in groupedMap) {
+    for (const [date, liters] of Object.entries(groupedMap[vehicle])) {
+      if (!dateTotals[date]) dateTotals[date] = 0;
+      dateTotals[date] += liters;
+    }
   }
 
+  let allDates = Object.keys(dateTotals);
 
+  if (startDate && endDate) {
+    allDates = allDates.filter(date => date >= startDate && date <= endDate);
+  }
+
+  allDates.sort();
+
+  const labels = allDates;
+  const totalValues = labels.map(date => dateTotals[date]);
+
+  return {
+    labels,
+    vehicleData: { total: totalValues }
+  };
+}
 
   document.getElementById('groupGranularity').value = 'daily';
 
   // Update Grouped Chart
   function updateGroupedChart(granularity = 'monthly') {
-    const { labels, vehicleData } = generateGroupedData(granularity);
+  const { labels, vehicleData } = generateGroupedData(granularity);
 
-    groupedChart.setOption({
-      tooltip: { trigger: 'axis' },
-      xAxis: {
-        type: 'category',
-        data: labels,
-        axisLabel: { color: '#fff' },
-        axisLine: { lineStyle: { color: '#ccc' } }
+  groupedChart.setOption({
+    tooltip: { trigger: 'axis' },
+    xAxis: {
+      type: 'category',
+      data: labels,
+      axisLabel: { color: '#fff' },
+      axisLine: { lineStyle: { color: '#ccc' } }
+    },
+    yAxis: {
+      type: 'value',
+      name: 'Fuel (Liters)',
+      nameTextStyle: { color: '#fff' },
+      axisLabel: { color: '#fff' },
+      axisLine: { lineStyle: { color: '#ccc' } },
+      splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.1)' } }
+    },
+    series: [{
+      name: 'Total Fuel Consumption',
+      type: 'line',
+      data: vehicleData.total,
+      lineStyle: { width: 3, color: '#3b84c0ff' },
+      areaStyle: {
+        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          { offset: 0, color: 'rgba(0, 221, 255, 0.7)' },
+          { offset: 1, color: 'rgba(77, 119, 255, 0.2)' }
+        ])
       },
-      yAxis: {
-        type: 'value',
-        name: 'Fuel (Liters)',
-        nameTextStyle: { color: '#fff' },
-        axisLabel: { color: '#fff' },
-        axisLine: { lineStyle: { color: '#ccc' } },
-        splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.1)' } }
-      },
-      series: Object.keys(vehicleData).map(vehicle => ({
-        name: vehicle,
-        type: 'line',
-        data: vehicleData[vehicle],
-        lineStyle: { width: 3, color: '#3b84c0ff' },
-        areaStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(0, 221, 255, 0.7)' },
-            { offset: 1, color: 'rgba(77, 119, 255, 0.2)' }
-          ])
-        },
-        itemStyle: { color: '#3b84c0' }
-      })),
-
-      backgroundColor: 'transparent'
-    });
-  }
-
+      itemStyle: { color: '#3b84c0' }
+    }],
+    backgroundColor: 'transparent'
+  });
+}
+  
   // Update Individual Chart
   function updateIndividualChart(vehicleId, fromDate, toDate) {
     const granularity = 'daily';
